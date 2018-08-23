@@ -21,9 +21,6 @@ public abstract class AsyncTask<REQUEST, RESPONSE> extends Thread{
 
     private REQUEST request;
 
-
-
-
     public AsyncTask(REQUEST request) {
         this.request = request;
     }
