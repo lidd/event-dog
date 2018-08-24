@@ -21,7 +21,7 @@ class MyTask extends AsyncTask<Request, Response>{
 //可作为全局变量，表示全局就一个eventloop重复提交任务
 Eventloop loop = new Eventloop();
 
-//提交任务
+//提交任务，此方法在eventloop满载时会阻塞
 loop.submit(MyTask(Request));
 
 //启动事件轮询，此方法只需执行一次
