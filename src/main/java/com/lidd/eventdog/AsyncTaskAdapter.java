@@ -3,7 +3,7 @@ package com.lidd.eventdog;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-public abstract class AsyncTask<REQUEST, RESPONSE> extends Thread{
+public abstract class AsyncTaskAdapter<P, R> extends Thread implements Excutable<P, R>, Callable<R>, AsyncStatus {
 
     private final int NEW = 0;
 
@@ -17,55 +17,67 @@ public abstract class AsyncTask<REQUEST, RESPONSE> extends Thread{
 
     private AtomicInteger status = new AtomicInteger(NEW);
 
-    private AtomicReference<RESPONSE> result = new AtomicReference<RESPONSE>(null);
+    private AtomicReference<R> result = new AtomicReference<>(null);
 
-    private REQUEST request;
+    private P param;
 
-    public AsyncTask(REQUEST request) {
-        this.request = request;
+    public AsyncTaskAdapter(P param) {
+        this.param = param;
     }
 
-    public abstract RESPONSE execute(REQUEST request);
+    public abstract R execute(P p);
 
-    public abstract void callback(RESPONSE response);
+    public abstract void callback(R r);
 
     @Override
     public void run() {
-        RESPONSE response = execute(request);
-        if (result.compareAndSet(null, response)) {
+        R r = execute(param);
+        if (result.compareAndSet(null, r)) {
             setFinished();
         }
     }
 
-    public RESPONSE getResult(){
+    public R getResult() {
         return result.get();
     }
 
-    public boolean setFinished(){
+    @Override
+    public boolean setFinished() {
         return status.compareAndSet(RUNNING, FINISHED);
     }
 
-    public boolean setRunning(){
+    @Override
+    public boolean setRunning() {
         return status.compareAndSet(READY, RUNNING);
     }
 
-    public boolean setReady(){
+    @Override
+    public boolean setReady() {
         return status.compareAndSet(NEW, READY);
     }
 
-    public boolean setCallbacked(){
+    @Override
+    public boolean setCallbacked() {
         return status.compareAndSet(FINISHED, CALLBACKED);
     }
 
-    public boolean isFinished(){
+    @Override
+    public boolean isFinished() {
         return status.get() >= FINISHED;
     }
 
-    public boolean isCallbacked(){
+    @Override
+    public boolean isCallbacked() {
         return status.get() == CALLBACKED;
     }
 
-    public boolean isReady(){
+    @Override
+    public boolean isReady() {
         return status.get() == READY;
+    }
+
+    @Override
+    public boolean isRunning() {
+        return status.get() == RUNNING;
     }
 }

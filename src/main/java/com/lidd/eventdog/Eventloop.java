@@ -7,7 +7,7 @@ public class Eventloop {
 
     private Executor executor = Executors.newFixedThreadPool(100);
 
-    private AsyncTask[] tasks = new AsyncTask[100];
+    private AsyncTaskAdapter[] tasks = new AsyncTaskAdapter[100];
 
     public void start() {
         for (int i = 0; ; i++) {
@@ -15,7 +15,7 @@ public class Eventloop {
                 i = 0;
             }
 
-            AsyncTask task = tasks[i];
+            AsyncTaskAdapter task = tasks[i];
             if (task == null) {
                 continue;
             }
@@ -47,7 +47,7 @@ public class Eventloop {
     }
 
 
-    public void submit(AsyncTask task) {
+    public void submit(AsyncTaskAdapter task) {
         if (task.isReady()) {
             for (int i = 0; ; i++) {
                 if (i == tasks.length) {
